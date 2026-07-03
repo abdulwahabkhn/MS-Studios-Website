@@ -12,16 +12,18 @@ const defaultOrigins = [
   'http://localhost:5500','http://127.0.0.1:5500','http://localhost:3000','http://127.0.0.1:3000',
 ];
 
-const allowedOrigins =
-  process.env.NODE_ENV === "production"
-    ? [process.env.CORS_ORIGIN]
-    : defaultOrigins;
+const allowedOrigins = [
+  'http://localhost:5500',
+  'http://127.0.0.1:5500',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+  process.env.CORS_ORIGIN,
+].filter(Boolean);
 
 
 app.use(cors({
   origin(origin, callback) {
     console.log("Origin:", origin);
-    console.log("Allowed:", allowedOrigins);
 
     if (!origin || allowedOrigins.includes(origin)) {
       return callback(null, true);
@@ -29,7 +31,11 @@ app.use(cors({
 
     return callback(new Error("Origin not allowed by CORS."));
   },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
 }));
+
+app.options('*', cors());
 
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
