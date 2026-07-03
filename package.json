@@ -1,0 +1,13 @@
+{
+  "name": "ms-studios-premium-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Premium static TailwindCSS website for MS Studios Jaranwala.",
+  "scripts": {
+    "build:css": "tailwindcss -c tailwind.config.js -i ./css/input.css -o ./assets/css/styles.css --minify",
+    "watch:css": "tailwindcss -c tailwind.config.js -i ./css/input.css -o ./assets/css/styles.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
