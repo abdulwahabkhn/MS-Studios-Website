@@ -104,7 +104,9 @@
         <div class="soft-card reveal">
           <span class="eyebrow">Booking Enquiry</span>
           <h2 class="section-title text-balance">Start with the essentials.</h2>
-          <form class="mt-8 grid gap-5" data-contact-form novalidate>
+          <form class="mt-8 grid gap-5" name="booking" method="POST" data-netlify="true" netlify data-contact-form
+            novalidate>
+            <input type="hidden" name="form-name" value="booking">
             <div class="grid gap-5 sm:grid-cols-2">
               <div class="form-field">
                 <label for="name">Name *</label>
@@ -168,20 +170,22 @@
           <article class="soft-card reveal">
             <span class="eyebrow">Direct Details</span>
             <div class="mt-5 grid gap-4">
-              <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold"
-                href="tel:+923006530509"><svg class="icon text-gold">
+              <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold" href="tel:+923006530509"><svg
+                  class="icon text-gold">
                   <use href="assets/icons/icons.svg#icon-phone"></use>
                 </svg><span>03006530509</span></a>
               <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold"
-                href="https://wa.me/923006530509?text=Hello%20MS%20Studio,%20I%20would%20like%20to%20book%20a%20photoshoot." target="_blank" rel="noopener noreferrer"><svg
-                  class="icon text-gold">
+                href="https://wa.me/923006530509?text=Hello%20MS%20Studio,%20I%20would%20like%20to%20book%20a%20photoshoot."
+                target="_blank" rel="noopener noreferrer"><svg class="icon text-gold">
                   <use href="assets/icons/icons.svg#icon-whatsapp"></use>
                 </svg><span>03006530509</span></a>
               <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold" href="mailto:EMAIL_HERE"><svg
                   class="icon text-gold">
                   <use href="assets/icons/icons.svg#icon-mail"></use>
                 </svg><span>EMAIL_HERE</span></a>
-              <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold" href="https://maps.google.com/?q=Jaranwala,Punjab,Pakistan" target="_blank" rel="noopener noreferrer"><svg class="icon text-gold">
+              <a class="flex items-center gap-4 text-ink/70 transition hover:text-gold"
+                href="https://maps.google.com/?q=Jaranwala,Punjab,Pakistan" target="_blank"
+                rel="noopener noreferrer"><svg class="icon text-gold">
                   <use href="assets/icons/icons.svg#icon-location"></use>
                 </svg><span>Jaranwala, Punjab, Pakistan</span></a>
             </div>
@@ -206,8 +210,9 @@
                 aria-label="YouTube"><svg class="icon">
                   <use href="assets/icons/icons.svg#icon-youtube"></use>
                 </svg></a>
-              <a class="social-link" href="https://wa.me/923006530509?text=Hello%20MS%20Studio,%20I%20would%20like%20to%20book%20a%20photoshoot." target="_blank" rel="noopener noreferrer"
-                aria-label="WhatsApp"><svg class="icon">
+              <a class="social-link"
+                href="https://wa.me/923006530509?text=Hello%20MS%20Studio,%20I%20would%20like%20to%20book%20a%20photoshoot."
+                target="_blank" rel="noopener noreferrer" aria-label="WhatsApp"><svg class="icon">
                   <use href="assets/icons/icons.svg#icon-whatsapp"></use>
                 </svg></a>
             </div>
