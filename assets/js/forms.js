@@ -25,16 +25,19 @@
   }
 
   function getContactEndpoint() {
-    if (window.MS_STUDIO_CONTACT_ENDPOINT) {
-      return window.MS_STUDIO_CONTACT_ENDPOINT;
-    }
-
-    const isLocalPage = window.location.protocol === 'file:'
-      || window.location.hostname === 'localhost'
-      || window.location.hostname === '127.0.0.1';
-
-    return isLocalPage ? 'http://localhost:5000/api/contact' : '/api/contact';
+  if (window.MS_STUDIO_CONTACT_ENDPOINT) {
+    return window.MS_STUDIO_CONTACT_ENDPOINT;
   }
+
+  const isLocalPage =
+    window.location.protocol === 'file:' ||
+    window.location.hostname === 'localhost' ||
+    window.location.hostname === '127.0.0.1';
+
+  return isLocalPage
+    ? 'http://localhost:5000/api/contact'
+    : 'https://ms-studios-website-production.up.railway.app/api/contact';
+}
 
   function trimFieldValue(form, fieldName) {
     const field = form.querySelector(`[name="${fieldName}"]`);
