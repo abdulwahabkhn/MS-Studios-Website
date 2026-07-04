@@ -13,6 +13,7 @@
     if (!service || !select) return;
 
     const decoded = decodeURIComponent(service);
+
     Array.from(select.options).forEach((option) => {
       if (option.value === decoded || option.textContent === decoded) {
         select.value = option.value;
@@ -24,26 +25,13 @@
     }
   }
 
-  function getContactEndpoint() {
-  if (window.MS_STUDIO_CONTACT_ENDPOINT) {
-    return window.MS_STUDIO_CONTACT_ENDPOINT;
-  }
-
-  const isLocalPage =
-    window.location.protocol === 'file:' ||
-    window.location.hostname === 'localhost' ||
-    window.location.hostname === '127.0.0.1';
-
-  return isLocalPage
-    ? 'http://localhost:5000/api/contact'
-    : 'https://ms-studios-website-production.up.railway.app/api/contact';
-}
-
   function trimFieldValue(form, fieldName) {
     const field = form.querySelector(`[name="${fieldName}"]`);
     const value = String(field?.value || '').trim();
 
-    if (field) field.value = value;
+    if (field) {
+      field.value = value;
+    }
 
     return value;
   }
@@ -55,7 +43,11 @@
   function isReasonablePhone(phone) {
     const digits = phone.replace(/\D/g, '');
 
-    return /^\+?[0-9\s().-]+$/.test(phone) && digits.length >= 7 && digits.length <= 15;
+    return (
+      /^\+?[0-9\s().-]+$/.test(phone) &&
+      digits.length >= 7 &&
+      digits.length <= 15
+    );
   }
 
   function setFieldError(form, fieldName, hasError) {
@@ -65,6 +57,12 @@
 
     field.classList.toggle('form-error', hasError);
     field.setAttribute('aria-invalid', String(hasError));
+  }
+
+  function clearFieldErrors(form) {
+    ['name', 'email', 'phone', 'message'].forEach((fieldName) => {
+      setFieldError(form, fieldName, false);
+    });
   }
 
   function setFeedback(feedback, title, message) {
@@ -105,62 +103,85 @@
     return !Object.values(errors).some(Boolean);
   }
 
-  function applyServerErrors(form, errors) {
-    Object.keys(errors || {}).forEach((fieldName) => {
-      setFieldError(form, fieldName, true);
+  function setSubmittingState(button, text) {
+    if (!button) return;
+
+    button.disabled = true;
+    button.textContent = 'Sending...';
+    button.setAttribute('aria-busy', 'true');
+    button.dataset.originalText = text;
+  }
+
+  function restoreSubmitButton(button, fallbackText) {
+    if (!button) return;
+
+    button.disabled = false;
+    button.textContent = button.dataset.originalText || fallbackText;
+    button.setAttribute('aria-busy', 'false');
+  }
+
+  async function submitNetlifyForm(form) {
+    const formData = new FormData(form);
+
+    const response = await fetch('/', {
+      method: 'POST',
+      body: formData,
     });
+
+    if (!response.ok) {
+      throw new Error(`Submission failed with status ${response.status}`);
+    }
   }
 
   function bindContactForm() {
     const form = document.querySelector('[data-contact-form]');
-    const success = document.querySelector('[data-form-success]');
-    const submitButton = form?.querySelector('[type="submit"]');
-    const submitText = submitButton?.textContent || 'Send Enquiry';
     if (!form) return;
+
+    const success = document.querySelector('[data-form-success]');
+    const successName = document.querySelector('[data-success-name]');
+    const submitButton = form.querySelector('[type="submit"]');
+    const submitText = submitButton?.textContent || 'Send Enquiry';
 
     form.addEventListener('submit', async (event) => {
       event.preventDefault();
 
+      clearFieldErrors(form);
+
       const payload = getContactPayload(form);
 
       if (!validateContactPayload(form, payload)) {
-        setFeedback(success, 'Please check the form.', 'Name, email, phone, and message are required. Use a valid email and phone number.');
+        setFeedback(
+          success,
+          'Please check the form.',
+          'Name, email, phone, and message are required. Use a valid email and phone number.'
+        );
         return;
       }
 
-      if (submitButton) {
-        submitButton.disabled = true;
-        submitButton.textContent = 'Sending...';
-        submitButton.setAttribute('aria-busy', 'true');
-      }
+      setSubmittingState(submitButton, submitText);
 
       try {
-        const response = await fetch(getContactEndpoint(), {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(payload),
-        });
-
-        const result = await response.json().catch(() => ({}));
-
-        if (!response.ok || !result.success) {
-          applyServerErrors(form, result.errors);
-          setFeedback(success, 'We could not send your booking.', result.message || 'Please try again in a moment.');
-          return;
-        }
+        await submitNetlifyForm(form);
 
         form.reset();
-        setFeedback(success, `Thank you, ${payload.name}.`, result.message || 'Booking sent successfully.');
-      } catch (error) {
-        setFeedback(success, 'We could not reach the booking server.', 'Please check your connection and try again.');
-      } finally {
-        if (submitButton) {
-          submitButton.disabled = false;
-          submitButton.textContent = submitText;
-          submitButton.setAttribute('aria-busy', 'false');
+
+        if (successName) {
+          successName.textContent = payload.name;
         }
+
+        setFeedback(
+          success,
+          `Thank you, ${payload.name}.`,
+          'Your enquiry has been sent to MS Studio. We will follow up soon.'
+        );
+      } catch (error) {
+        setFeedback(
+          success,
+          'We could not send your enquiry.',
+          'Something went wrong while sending your enquiry. Please try again in a moment.'
+        );
+      } finally {
+        restoreSubmitButton(submitButton, submitText);
       }
     });
   }

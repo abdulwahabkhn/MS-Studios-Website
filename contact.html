@@ -104,9 +104,17 @@
         <div class="soft-card reveal">
           <span class="eyebrow">Booking Enquiry</span>
           <h2 class="section-title text-balance">Start with the essentials.</h2>
-          <form class="mt-8 grid gap-5" name="booking" method="POST" data-netlify="true" netlify data-contact-form
-            novalidate>
+          <form name="booking" method="POST" data-netlify="true" netlify netlify-honeypot="bot-field"
+            class="mt-8 grid gap-5" data-contact-form novalidate>
             <input type="hidden" name="form-name" value="booking">
+
+            <p hidden>
+              <label>
+                Don't fill this out:
+                <input name="bot-field">
+              </label>
+            </p>
+
             <div class="grid gap-5 sm:grid-cols-2">
               <div class="form-field">
                 <label for="name">Name *</label>
