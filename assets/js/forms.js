@@ -1,6 +1,8 @@
 (function () {
   'use strict';
 
+  const WHATSAPP_BOOKING_URL = 'https://wa.me/923006530509';
+
   function getQueryParam(name) {
     return new URLSearchParams(window.location.search).get(name);
   }
@@ -84,6 +86,8 @@
       name: trimFieldValue(form, 'name'),
       email: trimFieldValue(form, 'email'),
       phone: trimFieldValue(form, 'phone'),
+      service: trimFieldValue(form, 'service'),
+      eventDate: trimFieldValue(form, 'event-date'),
       message: trimFieldValue(form, 'message'),
     };
   }
@@ -120,26 +124,36 @@
     button.setAttribute('aria-busy', 'false');
   }
 
-  async function submitFormspreeForm(form) {
-    const response = await fetch(form.action, {
-      method: "POST",
-      body: new FormData(form),
-      headers: {
-        Accept: "application/json",
-      },
-    });
+  function formatWhatsAppBookingMessage(payload) {
+    return [
+      'Hello MS Studios,',
+      '',
+      '📸 NEW BOOKING ENQUIRY',
+      '',
+      '👤 Name:',
+      payload.name,
+      '',
+      '📱 Phone:',
+      payload.phone,
+      '',
+      '📧 Email:',
+      payload.email,
+      '',
+      '🎥 Service:',
+      payload.service || 'Not provided',
+      '',
+      '📅 Event Date:',
+      payload.eventDate || 'Not provided',
+      '',
+      '📝 Message:',
+      payload.message,
+    ].join('\n');
+  }
 
-    let result = {};
-
-    try {
-      result = await response.json();
-    } catch (_) {
-      // Ignore if no JSON body
-    }
-
-    if (!response.ok) {
-      throw new Error(result.error || "Submission failed.");
-    }
+  function openWhatsAppBooking(payload) {
+    const message = formatWhatsAppBookingMessage(payload);
+    const encodedMessage = encodeURIComponent(message);
+    window.open(`${WHATSAPP_BOOKING_URL}?text=${encodedMessage}`, '_blank', 'noopener,noreferrer');
   }
 
   function bindContactForm() {
@@ -170,7 +184,7 @@
       setSubmittingState(submitButton, submitText);
 
       try {
-        await submitFormspreeForm(form);
+        openWhatsAppBooking(payload);
 
         form.reset();
 
@@ -181,13 +195,7 @@
         setFeedback(
           success,
           `Thank you, ${payload.name}.`,
-          'Your enquiry has been sent to MS Studio. We will follow up soon.'
-        );
-      } catch (error) {
-        setFeedback(
-          success,
-          'We could not send your enquiry.',
-          'Something went wrong while sending your enquiry. Please try again in a moment.'
+          'Your booking details have been prepared in WhatsApp. Please press Send inside WhatsApp to complete your enquiry.'
         );
       } finally {
         restoreSubmitButton(submitButton, submitText);
