@@ -120,16 +120,25 @@
     button.setAttribute('aria-busy', 'false');
   }
 
-  async function submitNetlifyForm(form) {
-    const formData = new FormData(form);
-
-    const response = await fetch('/', {
-      method: 'POST',
-      body: formData,
+  async function submitFormspreeForm(form) {
+    const response = await fetch(form.action, {
+      method: "POST",
+      body: new FormData(form),
+      headers: {
+        Accept: "application/json",
+      },
     });
 
+    let result = {};
+
+    try {
+      result = await response.json();
+    } catch (_) {
+      // Ignore if no JSON body
+    }
+
     if (!response.ok) {
-      throw new Error(`Submission failed with status ${response.status}`);
+      throw new Error(result.error || "Submission failed.");
     }
   }
 
@@ -161,7 +170,7 @@
       setSubmittingState(submitButton, submitText);
 
       try {
-        await submitNetlifyForm(form);
+        await submitFormspreeForm(form);
 
         form.reset();
 
